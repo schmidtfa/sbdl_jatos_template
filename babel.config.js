@@ -9,4 +9,5 @@ module.exports = {
     plugins: ['syntax-dynamic-import',
         '@babel/plugin-proposal-class-properties'
     ],
+
 };

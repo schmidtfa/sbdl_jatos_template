@@ -1,1 +1,8 @@
 node_modules
+.idea
+dist
+.jatos
+tmp
+jatos.zip
+jatos.jzip
+stats.json

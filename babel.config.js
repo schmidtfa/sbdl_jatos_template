@@ -7,7 +7,6 @@ module.exports = {
     }],
     '@babel/preset-react'],
     plugins: ['syntax-dynamic-import',
-        'lodash',
         '@babel/plugin-proposal-class-properties'
     ],
 };

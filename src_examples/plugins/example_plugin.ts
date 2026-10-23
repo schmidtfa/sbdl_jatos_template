@@ -23,7 +23,7 @@ type Info = typeof info;
 class HelloWorldPlugin implements JsPsychPlugin<Info> {
     static info = info;
 
-    constructor(private jsPsych: JsPsych) {}  // eslint-disable-line
+    constructor(private jsPsych: JsPsych) {}   
 
     trial(display_element: HTMLElement, trial: TrialType<Info>) {
         display_element.innerHTML = `

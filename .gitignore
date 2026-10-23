@@ -1,8 +1,13 @@
-node_modules
 .idea
-dist
 .jatos
 tmp
 jatos.zip
 jatos.jzip
 stats.json
+
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store

@@ -1,136 +1,149 @@
-# What is this?
+# jsPsych + Vite + JATOS Study Template
 
-If you want to write experiments that run on [Jatos](https://www.jatos.org/), you need to write them in javascript.
-This template provides you with a convenient structure and helpers to develop and finally deploy your experiment
-to Jatos.
+A template for developing and deploying browser-based behavioral experiments with [jsPsych 8](https://www.jspsych.org/v8/), [Vite](https://vite.dev/), and [JATOS](https://www.jatos.org/).
 
-The problem this template tries to solve is that it is much better to write these experiments using small
-files with dedicated functionality. This is very different from how it is ideal for running them on Jatos and the
-webbrowser.
+Write experiments as small, reusable JavaScript or TypeScript modules. Run individual study components locally, then build and package the complete study for import into JATOS.
 
-What we are basically doing here is:
+## Features
 
-1. You write your experiment in javascript files.
-2. We transform it to a "compiled" form that you can then upload to Jatos.
+- JavaScript and TypeScript experiment components
+- Fast local development with Vite
+- Automatic discovery of study components
+- Shared helpers and custom jsPsych plugins
+- Imports for images, audio, styles, and HTML stimuli
+- Production builds and JATOS study ZIP generation
+- ESLint and TypeScript checks
 
-# How to set things up
+## Requirements
 
-## Fork this repository
+- A Node.js version supported by your installed Vite version, and npm
+- Git (if cloning or contributing to the repository)
+- Access to a JATOS installation for deployment and end-to-end testing
 
-The best way to use this template is to create a fork of it on gitlab and do your changes in that fork. This allows you
-to benefit from any improvements done in the future. Care will be taken to not interfere with anything you write.
+## Getting started
 
-1. Go to https://gitlab.com/thht/jatos_template
-2. Make sure that you are logged in. If you do not have an account yet, now is the time to get one...
-3. You should see a small button called  "Fork". Click it.
-4. On the next page, choose a group/namespace where you want your project to live.
-5. In the left menu, choose "Settings->General".
-6. Change the "Project name" to reflect the name of your experiment project.
-7. Scroll down to "Advanced" and click "Expand".
-8. Scroll further down until you reach "Change path" and change the path, so it reflects the name of your experiment project.
-
-## Clone the forked repository to your hard drive
-
-You can clone your forked repository like any other repository:
-
-1. Go to the main page of your project by clicking on "Project" in the left menu of gitlab.
-2. Click on "Clone" (you find it to the right of the page).
-3. Copy the line under "Cline with SSH".
-4. Open a terminal on your computer and navigate to the folder under which your want to host your code.
-5. Type `git clone ####`, replacing `####` with what you copied above.
-6. Navigate into the folder that you just checked out.
-7. Type: `git remote add upstream git@gitlab.com:thht/jatos_template.git`
-
-## Install necessary software
-
-In order to work, this template relies on [nodejs](https://nodejs.org). The tools that are used in the background
-rely on it. So, head over and install it for your OS.
-
-When this is over, go back to the terminal, navigate to the root folder of your experiment project. Make sure that you
-see a file called "package.json" in the current folder. Next, we need to download all the nodejs packages that
-we need. This is really easy:
+Clone this GitHub repository (or your own fork) and install dependencies:
 
 ```bash
+git clone <your-github-repository-url>
+cd <repository-directory>
 npm install
 ```
 
-## Build and run the example experiment
-
-Type this:
+Start the development server:
 
 ```bash
 npm run dev-server
 ```
 
-After a while, your webbrowser will open and present you with a page having three links. These three links point
-to components of the example experiment. You can see the source files in `src_examples`.
+Open <http://127.0.0.1:8080/> to see the available example components. To open one directly, use a URL such as:
 
-## Inspecting the example experiment
+```text
+http://127.0.0.1:8080/index.html?component=visual_trials
+```
 
-Take a look at the `src_examples` folder. You see three `.js` files in the root folder. If you look at the web-page that
-has just opened, you see that each of the `.js` files corresponds to one entry on the web page.
+The development server listens on your own computer. Stop it with `Ctrl+C`.
 
-The reason for this is that Jatos structures parts of an experiment in "Components", independent parts of the experiment
-that run one after each other. Each `.js` file contains one component. In our case, there is one component for the
-instructions, one for the actual experiment and one to say goodbye.
+## Project structure
 
-Let's look at one of those files: `visual_trials.js`:
+```text
+lib/                 jsPsych/JATOS integration
+scripts/             Study packaging utilities
+src_examples/        Ready-to-run example components and helpers
+src/                 Your own study components (optional)
+public/              Static assets, if needed
+index.html           App HTML entry
+vite-entry.js        Component discovery and loading
+vite.config.mjs      Development and production configuration
+vite-env.d.ts        Vite asset import types
+tsconfig.json        TypeScript settings
+eslint.config.mjs    ESLint settings
+package.json         Project metadata and npm scripts
+```
 
-```javascript
+### Study components
+
+A JATOS study consists of **components** that can run in sequence. In this template, each top-level `.js`, `.jsx`, `.ts`, or `.tsx` file in the active source directory defines a component. Put reusable code in subdirectories such as `parts/` and `plugins/`.
+
+For example, a `visual_trials.ts` component might look like this:
+
+```typescript
 import { initJsPsychWithJatos } from '../lib/jatos.ts';
-import get_images_trials from './parts/show_images';
+import get_images_trials from './parts/show_images.js';
 
 const jsPsych = initJsPsychWithJatos();
 
 jsPsych.run([
-   get_images_trials(jsPsych, 10),
+  get_images_trials(jsPsych, 10),
 ]);
-
 ```
 
-The first line imports the function `initJsPsychWithJatos` which is a replacement function for [`initJsPsych`](https://www.jspsych.org/7.0/reference/jspsych/#initjspsych).
+The `initJsPsychWithJatos()` helper initializes jsPsych with the project's JATOS integration. You can explore the components, helpers, and custom plugin in `src_examples/`.
 
-**Please only use this function if you want to integrate your experiment in Jatos!!**
+### Create your own study
 
-The second line imports the function `get_image_trials` from the the javascript file you can find in `parts`.
+1. Set a meaningful package name in `package.json`, for example:
 
-The third line then initialises jsPsych.
+   ```bash
+   npm pkg set name=my-auditory-study
+   ```
 
-The fourth line the uses the `get_image_trials` function to create the jsPsych timeline.
+2. Create a `src/` directory and add one top-level entry file for each JATOS component. The directory must contain at least one component.
+3. Organize shared logic and media assets in subdirectories.
 
-Take a look at the other files and functions. Note that you can also import images and sound files like this (take
-a look at the `assets` folder!).
+When `src/` exists, the development and build configuration uses it instead of `src_examples/`. You can leave `src_examples/` in place for reference.
 
-# Coding your own experiment
+### Import assets
 
-In order to write your own experiment you need to do two things:
+Vite handles image and audio imports:
 
-1. Open the file `package.json`. The second line reads: `"name": "your_experiment_name_goes_here"`. Put the
-   name of your experiment in there.
-2. Create a folder called `src`. This is where your experiment source code is going to live.
+```javascript
+import sound from './parts/assets/sounds/440.mp3';
+import image from './parts/assets/images/correct.png';
+```
 
-As soon as the build process detects the `src` folder, it will start to build from there and ignore the `src_examples`
-folder. So there is no need for you to delete that one.
+To import an HTML fragment as a **string**, for instance as a jsPsych instruction stimulus, append `?raw`:
 
-# Building for Jatos
+```javascript
+import instructions from './parts/assets/instructions/instructions.html?raw';
+```
 
-In order to put your experiment into Jatos, you need a `zip` file with all the informations, scripts, images etc.
+## Available commands
 
-The template does this for you:
+| Command | Purpose |
+| --- | --- |
+| `npm run dev-server` | Start the local development server |
+| `npm run lint` | Check source code without modifying it |
+| `npm run lint-fix` | Automatically fix supported ESLint findings |
+| `npx tsc --noEmit` | Type-check the project |
+| `npm run build` | Lint, type-check, and build into `dist/` |
+| `npm run prod-server` | Preview the production build locally |
+| `npm run create_jatos_zip` | Build and package the study for JATOS |
+
+## Deploy to JATOS
+
+First, make sure `package.json` contains your study's actual name, rather than the template placeholder.
+
+Then run:
 
 ```bash
 npm run create_jatos_zip
 ```
 
-This generates a file called `jatos.zip` that you can upload to your jatos installation.
+The packaging command builds the project and creates `jatos.zip` in the repository root. Import that archive through your JATOS instance's study import interface.
 
-# Staying up-to-date
+**Test the imported study in JATOS before collecting participant data.** In particular, verify that all components load, media assets play or display correctly, results are saved, and the study advances between components. Local development runs outside JATOS and cannot verify the complete server integration.
 
-If you want to stay up-to-date with changes made to this template, issue:
+## Maintenance
 
-```bash
-git pull upstream master
-```
+Use `npm outdated` or `npx npm-check-updates` to review dependency updates. Check compatibility before accepting major-version changes, and rerun both the local build and JATOS deployment tests after upgrading dependencies.
 
-once in a while. As long as you make sure not to change anything in the files and folders that originally come with
-this template, there should be no problems.
+## Acknowledgments
+
+This repository is a new version built on the original [**thht/jatos_template**](https://gitlab.com/thht/jatos_template). Thanks Thomas Hartmann for providing the foundation and component-based approach on which this template builds and for your support in setting this up. OpenAI's ChatGPT was used to transition from the old to the new version of the JATOS Study Template.
+
+## Documentation
+
+- [jsPsych 8 documentation](https://www.jspsych.org/v8/)
+- [Vite documentation](https://vite.dev/guide/)
+- [JATOS documentation](https://www.jatos.org/)

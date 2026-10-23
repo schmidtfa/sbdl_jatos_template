@@ -26,6 +26,9 @@ const fs = require("fs");
 
     // 5. Output it.
     console.log(resultText);
+    if (results.some((result) => result.errorCount > 0)) {
+    process.exitCode = 1;
+}
 })().catch((error) => {
     process.exitCode = 1;
     console.error(error);

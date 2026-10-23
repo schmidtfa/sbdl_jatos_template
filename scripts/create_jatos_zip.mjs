@@ -2,14 +2,14 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import fs_extra from 'fs-extra';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { v5 as uuidv5 } from 'uuid';
-import glob from 'glob';
+import { globSync } from 'glob';
 
 const pkg_name = process.env.npm_package_name;
 
-if (pkg_name === 'your_experiment_name_goes_here') {
-    throw Error('Please set a proper name in package.json!');
+if (!pkg_name || pkg_name === 'your_experiment_name_goes_here') {
+    throw new Error('Please set a proper name in package.json!');
 }
 
 const zipit = () => new Promise((resolve) => {
@@ -40,7 +40,7 @@ const zipit = () => new Promise((resolve) => {
         },
     };
 
-    glob.sync(path.join(final_dir, '*.html')).forEach((html_file) => {
+    globSync(path.join(final_dir, '*.html')).forEach((html_file) => {
         const f_name = path.parse(html_file).base;
         const title = path.parse(html_file).name;
 
@@ -67,7 +67,7 @@ const zipit = () => new Promise((resolve) => {
         jatos_jas_str);
 
     const final_zip = fs.createWriteStream('jatos.zip');
-    const archive = archiver('zip');
+    const archive = new ZipArchive();
     archive.pipe(final_zip);
 
     archive.on('error', (err) => {

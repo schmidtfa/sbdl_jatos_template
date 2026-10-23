@@ -25,6 +25,7 @@
     },
     "rules": {
         "indent": ["error", 4],
+        "import/no-unresolved": ["error",{"ignore": ["\\?raw$"]}],
         "camelcase": "off",
         "no-underscore-dangle": "off",
         "import/prefer-default-export": "off",

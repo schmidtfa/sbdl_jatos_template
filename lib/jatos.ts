@@ -1,14 +1,16 @@
 import {initJsPsych, JsPsych, JsPsychExtension, JsPsychExtensionInfo} from "jspsych";
 
-interface InitializeParameters {}
+type JatosApi = {
+    submitResultData: (
+        data: string,
+        onSuccess?: () => void
+    ) => Promise<unknown>;
+    startNextComponent: () => void;
+};
 
-interface OnStartParameters {}
-
-interface OnLoadParameters {}
-
-interface OnFinishParameters {}
-
-declare const window: any;
+const jatosWindow = window as Window & {
+    jatos?: JatosApi;
+};
 
 export class Jatos implements JsPsychExtension {
     static info: JsPsychExtensionInfo = {
@@ -17,24 +19,25 @@ export class Jatos implements JsPsychExtension {
 
     constructor(private jsPsych: JsPsych) {}
 
-    initialize({}: InitializeParameters): Promise<void> {
+    initialize(): Promise<void> {
         return new Promise((resolve) => {
-            if ('jatos' in window) {
-                let settings = this.jsPsych.getInitSettings();
+            if (jatosWindow.jatos) {
+                const jatos = jatosWindow.jatos;
+                const settings = this.jsPsych.getInitSettings();
                 settings['on_finish'] = () => {
-                    let resultJson = this.jsPsych.data.get().json();
-                    window.jatos.submitResultData(resultJson, window.jatos.startNextComponent);
+                    const resultJson = this.jsPsych.data.get().json();
+                    jatos.submitResultData(resultJson, jatos.startNextComponent);
                 };
             }
             resolve();
         });
     };
 
-    on_start({}: OnStartParameters): void {};
+    on_start(): void {};
 
-    on_load({}: OnLoadParameters): void {};
+    on_load(): void {};
 
-    on_finish({}: OnFinishParameters): { [key: string]: any }{
+    on_finish(): Record<string, unknown> {
         return {};
     };
 }

@@ -15,6 +15,8 @@ const jatosWindow = window as Window & {
 export class Jatos implements JsPsychExtension {
     static info: JsPsychExtensionInfo = {
         name: "Jatos",
+        version: "0.1.0",
+        data: {},
     };
 
     constructor(private jsPsych: JsPsych) {}
@@ -42,20 +44,14 @@ export class Jatos implements JsPsychExtension {
     };
 }
 
-export function initJsPsychWithJatos(options?) : JsPsych {
-    if(typeof options === 'undefined') {
-        options = {
-            extensions: [
-                { type: Jatos },
-            ]
-        }
-    }
-
-    if ('extensions' !in options) {
-        options.extensions = [];
-    }
-
-    options.extensions.push({ type: Jatos });
-
-    return initJsPsych(options);
+export function initJsPsychWithJatos(
+    options: Parameters<typeof initJsPsych>[0] = {}
+): JsPsych {
+    return initJsPsych({
+        ...options,
+        extensions: [
+            ...(options.extensions ?? []),
+            { type: Jatos },
+        ],
+    });
 }
